@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { listPosts, listComments } from "./utilities/api";
+import PostDisplay from "./PostDisplay";
 
 function App() {
+  const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    async function loadPosts() {
+      const initialPosts = await listPosts();
+      setPosts(initialPosts);
+    }
+    async function loadComments() {
+      const initialComments = await listComments();
+      setComments(initialComments);
+    }
+    loadPosts();
+    loadComments();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <body className="App">
+      <div className="content-wrapper">
+        <div className="App-header">
+          <h1 className="App-title">Posts</h1>
+        </div>
+        <ul>
+          {posts.map((post) => {
+            return (
+              <PostDisplay
+                key={post.id}
+                post={post}
+                comments={comments.filter(
+                  (comment) => comment.postId === post.id
+                )}
+              />
+            );
+          })}
+        </ul>
+      </div>
+    </body>
   );
 }
 
